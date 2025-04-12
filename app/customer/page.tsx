@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Eye, EyeOff, RefreshCw, ScanLine } from "lucide-react"
+import { Eye, EyeOff, RefreshCw, ScanLine, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,8 +14,8 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import { TransactionHistory } from "@/components/transactionhistory"
-
+import { TransactionHistory } from "@/components/transaction-history"
+import { FestivalHeader } from "@/components/festiva-header" 
 
 export default function CustomerPage() {
   const { toast } = useToast()
@@ -278,24 +278,21 @@ export default function CustomerPage() {
   
 
   return (
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <FestivalHeader title="Festival Attendee Portal" showBackButton backUrl="/" />
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <Button variant="outline" asChild>
-          <Link href="/">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Link>
-        </Button>
+      <div className="max-w-md mx-auto">
+          <div className="flex items-center mb-6 space-x-2">
+            <User className="h-6 w-6 text-pink-600" />
+            <h1 className="text-3xl font-bold text-pink-600 dark:text-pink-300">Attendee Portal</h1>
       </div>
 
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Customer Portal</h1>
 
         {!walletInfo?.isValid ? (
-          <Card>
+          <Card className="festival-card">
             <CardHeader>
-              <CardTitle>Enter Your Wallet Seed</CardTitle>
-              <CardDescription>Enter your XRP Ledger wallet seed to make payments to merchants.</CardDescription>
+              <CardTitle className="text-pink-600 dark:text-pink-300">Connect Your Wallet</CardTitle>
+              <CardDescription>Enter your XRP Ledger wallet seed to make payments to vendors.</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSeedSubmit} className="space-y-4">
@@ -309,12 +306,13 @@ export default function CustomerPage() {
                       value={walletSeed}
                       onChange={(e) => setWalletSeed(e.target.value)}
                       required
+                      className="festival-input"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-pink-600"
                       onClick={() => setShowSeed(!showSeed)}
                     >
                       {showSeed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -325,7 +323,11 @@ export default function CustomerPage() {
                   </p>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading || !xrplService}>
+                <Button
+                    type="submit"
+                    className="w-full festival-button bg-gradient-to-r from-pink-600 to-amber-600"
+                    disabled={loading || !xrplService}
+                  >
                   {loading ? (
                     <>
                       <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -346,6 +348,7 @@ export default function CustomerPage() {
                   <Button 
                     type="button" 
                     variant="outline" 
+                    className="festival-button"
                     onClick={generateTestWallet} 
                     disabled={loading || !xrplService}
                   >
@@ -369,69 +372,91 @@ export default function CustomerPage() {
           </Card>
         ) : (
           <>
-            <Card className="mb-6">
+            <Card className="festival-card mb-6">
               <CardHeader>
-                <CardTitle>Wallet Connected</CardTitle>
+                <CardTitle className="text-pink-600 dark:text-pink-300">Wallet Connected</CardTitle>
                 <CardDescription>Your XRP Ledger wallet is connected and ready to make payments.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Address</Label>
-                  <Input value={walletInfo.address} readOnly />
+                  <Input value={walletInfo.address} readOnly className="festival-input font-mono" />
                 </div>
                 <div className="space-y-2">
                   <Label>Balance</Label>
-                  <div className="text-2xl font-bold">{walletInfo.balance} XRP</div>
+                  <div className="text-2xl font-bold text-pink-600 dark:text-pink-300">{walletInfo.balance} XRP</div>
                 </div>
-                <Button variant="outline" onClick={clearWallet} className="w-full">
+                <Button variant="outline" onClick={clearWallet} className="w-full festival-button">
                   Disconnect Wallet
                 </Button>
               </CardContent>
             </Card>
 
             <Tabs defaultValue="scan-qr" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="scan-qr">Scan QR Code</TabsTrigger>
-                <TabsTrigger value="manual-entry">Manual Entry</TabsTrigger>
-                <TabsTrigger value="transaction-history">History</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 festival-button p-1 bg-pink-100 dark:bg-pink-900/30">
+                  <TabsTrigger
+                    value="scan-qr"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+                  >
+                    Scan QR Code
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="manual-entry"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+                  >
+                    Manual Entry
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="transaction-history"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+                  >
+                    History
+                  </TabsTrigger>
               </TabsList>
 
               <TabsContent value="scan-qr">
-                <Card>
+                <Card className="festival-card">
                   <CardHeader>
-                    <CardTitle>Scan QR Code</CardTitle>
-                    <CardDescription>Scan a merchant's QR code to view and approve a transaction.</CardDescription>
+                    <CardTitle className="text-pink-600 dark:text-pink-300">Scan QR Code</CardTitle>
+                    <CardDescription>Scan a vendor's QR code to view and approve a transaction.</CardDescription>
                   </CardHeader>
                   <CardContent className="flex flex-col items-center justify-center p-6">
-                  {showScanner && (
-                  <>
-                  <BarcodeScannerComponent
-                    width={500}
-                    height={500}
-                    onUpdate={(err, result) => {
-                      if (result) {
-                        // setQrData(result.getText());
-                        setResult(result.getText());
-                        handleQrDataSubmitData(result.getText());
-                      } 
-                      else setResult("Not Found");
-                    }}
-                  />
-                  <p>{result}</p>
-                </>
-                  )}
-                  <Button onClick={() => setShowScanner(true)}>
-                    Open Camera to Scan
-                  </Button>
+                    {showScanner ? (
+                    <>
+                      <BarcodeScannerComponent
+                        width={500}
+                        height={500}
+                        onUpdate={(err, result) => {
+                          if (result) {
+                            // setQrData(result.getText());
+                            setResult(result.getText());
+                            handleQrDataSubmitData(result.getText());
+                          } 
+                          else setResult("Not Found");
+                        }}
+                      />
+                      <p>{result}</p>
+                    </>
+                    ) : (
+                    <div className="rounded-full bg-pink-100 dark:bg-pink-900/30 p-6 mb-4 festival-pulse">
+                        <ScanLine className="h-12 w-12 text-pink-600 dark:text-pink-400" />
+                    </div>
+                    )}
+                    <Button
+                      onClick={() => setShowScanner(true)}
+                      className="w-full festival-button bg-gradient-to-r from-pink-600 to-amber-600"
+                    >
+                      Open Camera to Scan
+                    </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="manual-entry">
-                <Card>
+               <Card className="festival-card">
                   <CardHeader>
-                    <CardTitle>Enter QR Code Data</CardTitle>
-                    <CardDescription>Manually enter the QR code data provided by the merchant.</CardDescription>
+                    <CardTitle className="text-pink-600 dark:text-pink-300">Enter QR Code Data</CardTitle>
+                    <CardDescription>Manually enter the QR code data provided by the vendor.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleQrDataSubmit} className="space-y-4">
@@ -443,10 +468,14 @@ export default function CustomerPage() {
                           value={qrData}
                           onChange={(e) => setQrData(e.target.value)}
                           required
+                          className="festival-input"
                         />
                       </div>
 
-                      <Button type="submit" className="w-full">
+                      <Button
+                        type="submit"
+                        className="w-full festival-button bg-gradient-to-r from-pink-600 to-amber-600"
+                      >
                         Process Payment
                       </Button>
                     </form>
@@ -455,9 +484,9 @@ export default function CustomerPage() {
               </TabsContent>
 
               <TabsContent value="transaction-history">
-                <Card>
+               <Card className="festival-card">
                   <CardHeader>
-                    <CardTitle>Transaction History</CardTitle>
+                    <CardTitle className="text-pink-600 dark:text-pink-300">Transaction History</CardTitle>
                     <CardDescription>View your payment history and transaction details.</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -468,6 +497,7 @@ export default function CustomerPage() {
             </Tabs>
           </>
         )}
+        </div>
       </div>
     </div>
   )

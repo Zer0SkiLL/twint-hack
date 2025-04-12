@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Copy, Eye, EyeOff, RefreshCw } from "lucide-react"
+import { Copy, Eye, EyeOff, RefreshCw, Music, Ticket } from "lucide-react"
 import { QRCodeSVG } from "qrcode.react"
 
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { TransactionStatus } from "@/components/transaction-status"
-import { TransactionHistory } from "@/components/transactionhistory" 
+import { TransactionHistory } from "@/components/transaction-history" 
+import { FestivalHeader } from "@/components/festiva-header"
 
 export default function MerchantPage() {
   const { toast } = useToast()
@@ -372,24 +373,22 @@ export default function MerchantPage() {
   }, [activeOrder?.id])
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <Button variant="outline" asChild>
-          <Link href="/">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Link>
-        </Button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <FestivalHeader title="Vendor Portal" showBackButton backUrl="/" />
+        <div className="container mx-auto py-8 px-4">
+
 
       <div className="grid gap-8 md:grid-cols-2">
         <div>
-          <h1 className="text-3xl font-bold mb-6">Merchant Portal</h1>
+          <div className="flex items-center mb-6 space-x-2">
+            <Ticket className="h-6 w-6 text-purple-600" />
+            <h1 className="text-3xl font-bold text-purple-800 dark:text-purple-200">Vendor Portal</h1>
+          </div>
 
           {!walletInfo?.isValid ? (
-            <Card>
+            <Card className="festival-card">
               <CardHeader>
-                <CardTitle>Enter Your Wallet Seed</CardTitle>
+                <CardTitle className="text-purple-700 dark:text-purple-300">Connect Your Wallet</CardTitle>
                 <CardDescription>
                   Enter your XRP Ledger wallet seed to create orders and receive payments.
                 </CardDescription>
@@ -406,12 +405,13 @@ export default function MerchantPage() {
                         value={walletSeed}
                         onChange={(e) => setWalletSeed(e.target.value)}
                         required
+                        className="festival-input"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600"
                         onClick={() => setShowSeed(!showSeed)}
                       >
                         {showSeed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -422,7 +422,11 @@ export default function MerchantPage() {
                     </p>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={loading || !xrplService}>
+                  <Button
+                    type="submit"
+                    className="w-full festival-button bg-gradient-to-r from-purple-600 to-pink-600"
+                    disabled={loading || !xrplService}
+                  >
                     {loading ? (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -444,6 +448,7 @@ export default function MerchantPage() {
                       type="button"
                       variant="outline"
                       onClick={generateTestWallet}
+                      className="festival-button"
                       disabled={loading || !xrplService}
                     >
                       {loading ? (
@@ -466,16 +471,31 @@ export default function MerchantPage() {
             </Card>
           ) : (
             <Tabs defaultValue="create-order" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="create-order">Create Order</TabsTrigger>
-                <TabsTrigger value="order-history">Order History</TabsTrigger>
-                <TabsTrigger value="wallet-info">Wallet Info</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 festival-button p-1 bg-purple-100 dark:bg-purple-900/30">
+                <TabsTrigger
+                  value="create-order"
+                  className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+                >
+                  Create Order
+                </TabsTrigger>
+                <TabsTrigger
+                  value="order-history"
+                  className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+                >
+                  Order History
+                </TabsTrigger>
+                <TabsTrigger
+                  value="wallet-info"
+                  className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+                >
+                  Wallet Info
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="create-order">
-                <Card>
+                <Card className="festival-card">
                   <CardHeader>
-                    <CardTitle>Create New Order</CardTitle>
+                    <CardTitle className="text-purple-700 dark:text-purple-300">Create New Order</CardTitle>
                     <CardDescription>
                       Fill in the details to create a new order and generate a QR code for customer payment.
                     </CardDescription>
@@ -491,6 +511,7 @@ export default function MerchantPage() {
                           value={orderData.description}
                           onChange={handleInputChange}
                           required
+                          className="festival-input"
                         />
                       </div>
 
@@ -506,6 +527,7 @@ export default function MerchantPage() {
                             value={orderData.amount}
                             onChange={handleInputChange}
                             required
+                            className="festival-input"
                           />
                         </div>
                         <div className="space-y-2">
@@ -516,11 +538,16 @@ export default function MerchantPage() {
                             value={orderData.currency}
                             onChange={handleInputChange}
                             disabled
+                            className="festival-input"
                           />
                         </div>
                       </div>
 
-                      <Button type="submit" className="w-full" disabled={loading}>
+                      <Button
+                        type="submit"
+                        className="w-full festival-button bg-gradient-to-r from-purple-600 to-pink-600"
+                        disabled={loading}
+                      >
                         {loading ? (
                           <>
                             <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -536,9 +563,9 @@ export default function MerchantPage() {
               </TabsContent>
 
               <TabsContent value="order-history">
-                <Card>
+                <Card className="festival-card">
                   <CardHeader>
-                    <CardTitle>Order History</CardTitle>
+                    <CardTitle className="text-purple-700 dark:text-purple-300">Order History</CardTitle>
                     <CardDescription>View all your past orders and their payment status.</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -548,17 +575,22 @@ export default function MerchantPage() {
               </TabsContent>
 
               <TabsContent value="wallet-info">
-                <Card>
+                <Card className="festival-card">
                   <CardHeader>
-                    <CardTitle>Merchant Wallet Information</CardTitle>
+                    <CardTitle className="text-purple-700 dark:text-purple-300">Wallet Information</CardTitle>
                     <CardDescription>Your XRP Ledger wallet details.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label>Wallet Address</Label>
                       <div className="flex items-center gap-2">
-                        <Input value={walletInfo.address} readOnly />
-                        <Button variant="outline" size="icon" onClick={() => copyToClipboard(walletInfo.address)}>
+                        <Input value={walletInfo.address} readOnly className="festival-input font-mono" />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => copyToClipboard(walletInfo.address)}
+                            className="text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                          >
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>
@@ -566,18 +598,25 @@ export default function MerchantPage() {
 
                     <div className="space-y-2">
                       <Label>Balance</Label>
-                      <div className="text-2xl font-bold">{walletInfo.balance} XRP</div>
+                      <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                        {walletInfo.balance} XRP
+                      </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label>Wallet Seed (Keep Secret!)</Label>
                       <div className="relative">
-                        <Input type={showSeed ? "text" : "password"} value={walletSeed} readOnly />
+                        <Input
+                            type={showSeed ? "text" : "password"}
+                            value={walletSeed}
+                            readOnly
+                            className="festival-input font-mono"
+                          />
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="absolute right-2 top-1/2 -translate-y-1/2"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-purple-600"
                           onClick={() => setShowSeed(!showSeed)}
                         >
                           {showSeed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -585,7 +624,7 @@ export default function MerchantPage() {
                       </div>
                     </div>
 
-                    <Button variant="destructive" onClick={clearWallet} className="w-full mt-4">
+                    <Button variant="destructive" onClick={clearWallet} className="w-full mt-4 festival-button">
                       Clear Wallet Information
                     </Button>
                   </CardContent>
@@ -596,29 +635,43 @@ export default function MerchantPage() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-6">Active Order</h2>
+        <div className="flex items-center mb-6 space-x-2">
+          <Music className="h-6 w-6 text-pink-600" />
+          <h2 className="text-2xl font-bold text-pink-600 dark:text-pink-300">Active Order</h2>
+        </div>
 
           {activeOrder ? (
-            <Card>
+            <Card className="festival-card festival-card-glow">
               <CardHeader>
-                <CardTitle>Order #{activeOrder.id}</CardTitle>
+                <CardTitle className="text-pink-600 dark:text-pink-300">Order #{activeOrder.id}</CardTitle>
                 <CardDescription>Share this QR code with your customer to complete the payment.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex flex-col items-center justify-center p-4 border rounded-lg bg-white">
-                  <QRCodeSVG value={activeOrder.qrCode} size={200} level="H" includeMargin />
-                  <p className="mt-2 text-sm text-center text-gray-500">Scan to view transaction details</p>
+                <div className="flex flex-col items-center justify-center p-6 border rounded-lg bg-white">
+                  <div className="p-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl">
+                    <div className="bg-white p-2 rounded-lg">
+                      <QRCodeSVG
+                        value={activeOrder.qrCode}
+                        size={200}
+                        level="H"
+                        includeMargin
+                        bgColor="#FFFFFF"
+                        fgColor="#9333EA"
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm text-center text-gray-500">Scan to view transaction details</p>
                 </div>
 
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-sm text-gray-500">Description</Label>
-                      <p className="font-medium">{activeOrder.description}</p>
+                      <p className="font-medium text-purple-800 dark:text-purple-200">{activeOrder.description}</p>
                     </div>
                     <div>
                       <Label className="text-sm text-gray-500">Amount</Label>
-                      <p className="font-medium">
+                      <p className="font-medium text-purple-800 dark:text-purple-200">
                         {activeOrder.amount} {activeOrder.currency}
                       </p>
                     </div>
@@ -627,8 +680,13 @@ export default function MerchantPage() {
                   <div>
                     <Label className="text-sm text-gray-500">QR Code Data</Label>
                     <div className="flex items-center gap-2 mt-1">
-                      <Input value={activeOrder.qrCode} readOnly />
-                      <Button variant="outline" size="icon" onClick={() => copyToClipboard(activeOrder.qrCode)}>
+                      <Input value={activeOrder.qrCode} readOnly className="festival-input font-mono text-xs" />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => copyToClipboard(activeOrder.qrCode)}
+                          className="text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                        >
                         <Copy className="h-4 w-4" />
                       </Button>
                     </div>
@@ -641,24 +699,25 @@ export default function MerchantPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full" onClick={resetForm}>
+                <Button variant="outline" className="w-full festival-button" onClick={resetForm}>
                   Create New Order
                 </Button>
               </CardFooter>
             </Card>
           ) : (
-            <Card>
+            <Card className="festival-card h-[500px] flex flex-col items-center justify-center">
               <CardContent className="flex flex-col items-center justify-center p-8">
-                <div className="rounded-full bg-gray-100 p-6 mb-4">
-                  <QRCodeSVG value="No active order" size={100} level="L" includeMargin />
+                <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-6 mb-4 festival-pulse">
+                  <Ticket className="h-12 w-12 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-xl font-medium mb-2">No Active Order</h3>
+                <h3 className="text-xl font-medium mb-2 text-purple-800 dark:text-purple-200">No Active Order</h3>
                 <p className="text-center text-gray-500 mb-4">
                   Create a new order to generate a QR code for customer payment.
                 </p>
               </CardContent>
             </Card>
           )}
+          </div>
         </div>
       </div>
     </div>
