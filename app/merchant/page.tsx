@@ -321,12 +321,43 @@ export default function MerchantPage() {
           txHash: data.txHash,
         }))
 
-        const newBalance = await xrplService.getWalletBalance(walletInfo!.address)
+        if (data.status === "completed") {
+          const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
+          const orderIndex = orders.findIndex((order: any) => order.id === activeOrder.id)
+          if (orderIndex !== -1) {
+            orders[orderIndex].status = "completed"
+            localStorage.setItem("merchantOrders", JSON.stringify(orders))
+          }
 
-        setWalletInfo((prev) => ({
-          ...prev!,
-          balance: newBalance,
-        }))
+          // update balance
+          const newBalance = await xrplService.getWalletBalance(walletInfo!.address)
+
+          setWalletInfo((prev) => ({
+            ...prev!,
+            balance: newBalance,
+          }))
+        }
+        if (data.status === "declined") {
+          const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
+          const orderIndex = orders.findIndex((order: any) => order.id === activeOrder.id)
+          if (orderIndex !== -1) {
+            orders[orderIndex].status = "declined"
+            localStorage.setItem("merchantOrders", JSON.stringify(orders))
+          }
+        }
+
+        // update order history
+        const updatedOrderHistory = orderHistory.map((order) => {
+          if (order.id === activeOrder.id) {
+            return {
+              ...order,
+              status: data.status,
+              txHash: data.txHash,
+            }
+          }
+          return order
+        })
+        setOrderHistory(updatedOrderHistory)
   
         toast({
           title: `Order ${data.status}`,
