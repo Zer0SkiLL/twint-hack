@@ -93,7 +93,9 @@ export default function CustomerPage() {
       if (transactionHistoryKey) {
         try {
           const storedTransactions = JSON.parse(localStorage.getItem(transactionHistoryKey) || "[]")
-          transactions.push(...storedTransactions)
+          // transactions.push(...storedTransactions)
+          console.log("Loaded transactions from localStorage:", storedTransactions)
+          console.log("All transactions:", transactions)
         } catch (error) {
           console.error("Error loading transaction history:", error)
         }

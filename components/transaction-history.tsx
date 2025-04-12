@@ -29,6 +29,7 @@ export function TransactionHistory({ transactions, userType }: TransactionHistor
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest")
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed" | "declined">("all")
 
+  console.log("Transactions:", transactions)
   // Sort transactions by date
   const sortedTransactions = [...transactions].sort((a, b) => {
     const dateA = new Date(a.timestamp).getTime()
