@@ -319,40 +319,6 @@ export default function MerchantPage() {
     }
   }, [activeOrder?.id])
 
-  // const checkOrderStatus = () => {
-  //   // In a real app, this would check the XRPL for transaction status
-  //   // For demo, we'll check localStorage
-  //   console.log("Checking order status...")
-  //   if (!activeOrder) return
-  //   console.log("Active order:", activeOrder)
-  //   if (activeOrder) {
-  //     const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
-  //     const order = orders.find((o: any) => o.id === activeOrder.id)
-  //     console.log("Order found:", order)
-
-  //     if (order && order.status !== activeOrder.status) {
-  //       setActiveOrder({
-  //         ...activeOrder,
-  //         status: order.status,
-  //         txHash: order.txHash,
-  //       })
-
-  //       if (order.status === "completed") {
-  //         toast({
-  //           title: "Payment received!",
-  //           description: `Order ${order.id} has been paid.`,
-  //         })
-  //       }
-  //     }
-  //   }
-  // }
-
-  // // Check order status every seconds
-  // useEffect(() => {
-  //   const interval = setInterval(checkOrderStatus, 1000)
-  //   return () => clearInterval(interval)
-  // }, [activeOrder])
-
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
