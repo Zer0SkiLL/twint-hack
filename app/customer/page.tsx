@@ -13,9 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-// import { Html5QrcodeScanner } from "html5-qrcode";
-import { QrReader } from 'react-qr-reader';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import { TransactionHistory } from "@/components/transactionhistory"
 
 
 export default function CustomerPage() {
@@ -35,14 +34,8 @@ export default function CustomerPage() {
   const [isScanning, setIsScanning] = useState(false);
   // const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [showScanner, setShowScanner] = useState(false);
-
-  //test
+  const [transactionHistory, setTransactionHistory] = useState<any[]>([])
   const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // video testing
-
-  
 
 
   // Load the XRPL service dynamically
@@ -76,6 +69,47 @@ export default function CustomerPage() {
       }
     }
   }, [xrplService])
+
+  // Load transaction history from localStorage
+  useEffect(() => {
+    const loadTransactionHistory = () => {
+      // Get all transactions where this customer was involved
+      const currentTransaction = localStorage.getItem("currentTransaction")
+      const transactions = []
+
+      if (currentTransaction) {
+        try {
+          const parsedTransaction = JSON.parse(currentTransaction)
+          if (walletInfo && parsedTransaction.customerAddress === walletInfo.address) {
+            transactions.push(parsedTransaction)
+          }
+        } catch (error) {
+          console.error("Error parsing current transaction:", error)
+        }
+      }
+
+      // Get transaction history from localStorage
+      const transactionHistoryKey = walletInfo ? `transactions_${walletInfo.address}` : null
+      if (transactionHistoryKey) {
+        try {
+          const storedTransactions = JSON.parse(localStorage.getItem(transactionHistoryKey) || "[]")
+          transactions.push(...storedTransactions)
+        } catch (error) {
+          console.error("Error loading transaction history:", error)
+        }
+      }
+
+      setTransactionHistory(transactions)
+    }
+
+    if (walletInfo) {
+      loadTransactionHistory()
+
+      // Set up an interval to refresh the transaction history
+      const interval = setInterval(loadTransactionHistory, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [walletInfo])
 
   const validateWallet = async (seed: string) => {
     if (!xrplService) {
@@ -193,22 +227,6 @@ export default function CustomerPage() {
       })
     }
   }
-
-  // const handleScanQR = () => {
-  //   toast({
-  //     title: "QR Scanner",
-  //     description: "In a real app, this would open your device camera to scan a QR code.",
-  //   })
-
-  //   // In a real app, this would use the device camera to scan a QR code
-  //   // For demo purposes, we'll just show a prompt to enter QR data manually
-  //   setTimeout(() => {
-  //     toast({
-  //       title: "Please use manual entry",
-  //       description: "For this demo, please use the manual entry tab to enter QR code data.",
-  //     })
-  //   }, 2000)
-  // }
 
   const clearWallet = () => {
     localStorage.removeItem("customerWalletSeed")
@@ -372,9 +390,10 @@ export default function CustomerPage() {
             </Card>
 
             <Tabs defaultValue="scan-qr" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="scan-qr">Scan QR Code</TabsTrigger>
                 <TabsTrigger value="manual-entry">Manual Entry</TabsTrigger>
+                <TabsTrigger value="transaction-history">History</TabsTrigger>
               </TabsList>
 
               <TabsContent value="scan-qr">
@@ -383,17 +402,6 @@ export default function CustomerPage() {
                     <CardTitle>Scan QR Code</CardTitle>
                     <CardDescription>Scan a merchant's QR code to view and approve a transaction.</CardDescription>
                   </CardHeader>
-                  {/* <CardContent className="flex flex-col items-center justify-center p-6">
-                    <div className="rounded-full bg-gray-100 p-6 mb-4">
-                      <ScanLine className="h-12 w-12 text-gray-400" />
-                    </div>
-                    <p className="text-center text-gray-500 mb-6">
-                      Position the QR code within the scanner frame to automatically detect it.
-                    </p>
-                    <Button onClick={handleScanQR} className="w-full">
-                      Open Camera to Scan
-                    </Button>
-                  </CardContent> */}
                   <CardContent className="flex flex-col items-center justify-center p-6">
                   {showScanner && (
                   <>
@@ -442,6 +450,18 @@ export default function CustomerPage() {
                         Process Payment
                       </Button>
                     </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="transaction-history">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Transaction History</CardTitle>
+                    <CardDescription>View your payment history and transaction details.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TransactionHistory transactions={transactionHistory} userType="customer" />
                   </CardContent>
                 </Card>
               </TabsContent>

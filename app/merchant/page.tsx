@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { TransactionStatus } from "@/components/transaction-status"
+import { TransactionHistory } from "@/components/transactionhistory" 
 
 export default function MerchantPage() {
   const { toast } = useToast()
@@ -43,6 +44,7 @@ export default function MerchantPage() {
     txHash?: string
   } | null>(null)
   const [xrplService, setXrplService] = useState<any>(null)
+  const [orderHistory, setOrderHistory] = useState<any[]>([])
 
   // Load the XRPL service dynamically
   useEffect(() => {
@@ -75,6 +77,20 @@ export default function MerchantPage() {
       }
     }
   }, [xrplService])
+
+  // Load order history from localStorage
+  useEffect(() => {
+    const loadOrderHistory = () => {
+      const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
+      setOrderHistory(orders)
+    }
+
+    loadOrderHistory()
+
+    // Set up an interval to refresh the order history
+    const interval = setInterval(loadOrderHistory, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
   const validateWallet = async (seed: string) => {
     if (!xrplService) {
@@ -186,7 +202,7 @@ export default function MerchantPage() {
 
       // Store the order in localStorage for status tracking
       const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
-      orders.push({
+      const newOrder = {
         id: orderId,
         description: orderData.description,
         amount: orderData.amount,
@@ -194,8 +210,13 @@ export default function MerchantPage() {
         status: "pending",
         merchantAddress: walletInfo.address,
         timestamp: new Date().toISOString(),
-      })
+      }
+
+      orders.push(newOrder)
       localStorage.setItem("merchantOrders", JSON.stringify(orders))
+
+      // Update the order history
+      setOrderHistory([...orders])
 
       toast({
         title: "Order created",
@@ -300,12 +321,43 @@ export default function MerchantPage() {
           txHash: data.txHash,
         }))
 
-        const newBalance = await xrplService.getWalletBalance(walletInfo!.address)
+        if (data.status === "completed") {
+          const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
+          const orderIndex = orders.findIndex((order: any) => order.id === activeOrder.id)
+          if (orderIndex !== -1) {
+            orders[orderIndex].status = "completed"
+            localStorage.setItem("merchantOrders", JSON.stringify(orders))
+          }
 
-        setWalletInfo((prev) => ({
-          ...prev!,
-          balance: newBalance,
-        }))
+          // update balance
+          const newBalance = await xrplService.getWalletBalance(walletInfo!.address)
+
+          setWalletInfo((prev) => ({
+            ...prev!,
+            balance: newBalance,
+          }))
+        }
+        if (data.status === "declined") {
+          const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
+          const orderIndex = orders.findIndex((order: any) => order.id === activeOrder.id)
+          if (orderIndex !== -1) {
+            orders[orderIndex].status = "declined"
+            localStorage.setItem("merchantOrders", JSON.stringify(orders))
+          }
+        }
+
+        // update order history
+        const updatedOrderHistory = orderHistory.map((order) => {
+          if (order.id === activeOrder.id) {
+            return {
+              ...order,
+              status: data.status,
+              txHash: data.txHash,
+            }
+          }
+          return order
+        })
+        setOrderHistory(updatedOrderHistory)
   
         toast({
           title: `Order ${data.status}`,
@@ -414,8 +466,9 @@ export default function MerchantPage() {
             </Card>
           ) : (
             <Tabs defaultValue="create-order" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="create-order">Create Order</TabsTrigger>
+                <TabsTrigger value="order-history">Order History</TabsTrigger>
                 <TabsTrigger value="wallet-info">Wallet Info</TabsTrigger>
               </TabsList>
 
@@ -478,6 +531,18 @@ export default function MerchantPage() {
                         )}
                       </Button>
                     </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="order-history">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order History</CardTitle>
+                    <CardDescription>View all your past orders and their payment status.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <TransactionHistory transactions={orderHistory} userType="merchant" />
                   </CardContent>
                 </Card>
               </TabsContent>

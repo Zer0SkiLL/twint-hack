@@ -125,21 +125,27 @@ export default function TransactionPage() {
         setTransaction(updatedTransaction)
         localStorage.setItem("currentTransaction", JSON.stringify(updatedTransaction))
 
-        // here we'll update the merchant orders in localStorage
-        const updatedMerchantOrders = JSON.parse(
-          localStorage.getItem("merchantOrders") || "[]",
-        ).map((order: any) => {
-          if (order.id === transaction.orderId) {
-            return {
-              ...order,
-              status: "completed",
-              txHash: result.txHash,
-            }
-          }
-          return order
-        })
+        // // here we'll update the merchant orders in localStorage
+        // const updatedMerchantOrders = JSON.parse(
+        //   localStorage.getItem("merchantOrders") || "[]",
+        // ).map((order: any) => {
+        //   if (order.id === transaction.orderId) {
+        //     return {
+        //       ...order,
+        //       status: "completed",
+        //       txHash: result.txHash,
+        //     }
+        //   }
+        //   return order
+        // })
 
-        localStorage.setItem("merchantOrders", JSON.stringify(updatedMerchantOrders))
+        // localStorage.setItem("merchantOrders", JSON.stringify(updatedMerchantOrders))
+
+        // Save to customer's transaction history
+        const transactionHistoryKey = `transactions_${transaction.customerAddress}`
+        const customerTransactions = JSON.parse(localStorage.getItem(transactionHistoryKey) || "[]")
+        customerTransactions.push(updatedTransaction)
+        localStorage.setItem(transactionHistoryKey, JSON.stringify(customerTransactions))
 
         // we'll also update the merchant via webSocket
         // const socket = new WebSocket("ws://localhost:3001")
@@ -189,20 +195,26 @@ export default function TransactionPage() {
       }
 
       setTransaction(updatedTransaction)
-      localStorage.setItem("currentTransaction", JSON.stringify(updatedTransaction))
+      // localStorage.setItem("currentTransaction", JSON.stringify(updatedTransaction))
 
-      // Update merchant orders in localStorage to reflect declined payment
-      const merchantOrders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
-      const updatedOrders = merchantOrders.map((order: any) => {
-        if (order.id === transaction.orderId) {
-          return {
-            ...order,
-            status: "declined",
-          }
-        }
-        return order
-      })
-      localStorage.setItem("merchantOrders", JSON.stringify(updatedOrders))
+      // // Update merchant orders in localStorage to reflect declined payment
+      // const merchantOrders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
+      // const updatedOrders = merchantOrders.map((order: any) => {
+      //   if (order.id === transaction.orderId) {
+      //     return {
+      //       ...order,
+      //       status: "declined",
+      //     }
+      //   }
+      //   return order
+      // })
+      // localStorage.setItem("merchantOrders", JSON.stringify(updatedOrders))
+
+      // Save to customer's transaction history
+      const transactionHistoryKey = `transactions_${transaction.customerAddress}`
+      const customerTransactions = JSON.parse(localStorage.getItem(transactionHistoryKey) || "[]")
+      customerTransactions.push(updatedTransaction)
+      localStorage.setItem(transactionHistoryKey, JSON.stringify(customerTransactions))
 
       toast({
         title: "Payment declined",
