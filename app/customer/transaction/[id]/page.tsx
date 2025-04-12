@@ -141,6 +141,12 @@ export default function TransactionPage() {
 
         localStorage.setItem("merchantOrders", JSON.stringify(updatedMerchantOrders))
 
+        // Save to customer's transaction history
+        const transactionHistoryKey = `transactions_${transaction.customerAddress}`
+        const customerTransactions = JSON.parse(localStorage.getItem(transactionHistoryKey) || "[]")
+        customerTransactions.push(updatedTransaction)
+        localStorage.setItem(transactionHistoryKey, JSON.stringify(customerTransactions))
+
         // we'll also update the merchant via webSocket
         // const socket = new WebSocket("ws://localhost:3001")
         const socket = new WebSocket("wss://3cdb-153-46-253-205.ngrok-free.app")
@@ -203,6 +209,12 @@ export default function TransactionPage() {
         return order
       })
       localStorage.setItem("merchantOrders", JSON.stringify(updatedOrders))
+
+      // Save to customer's transaction history
+      const transactionHistoryKey = `transactions_${transaction.customerAddress}`
+      const customerTransactions = JSON.parse(localStorage.getItem(transactionHistoryKey) || "[]")
+      customerTransactions.push(updatedTransaction)
+      localStorage.setItem(transactionHistoryKey, JSON.stringify(customerTransactions))
 
       toast({
         title: "Payment declined",
