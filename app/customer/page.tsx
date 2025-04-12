@@ -257,60 +257,6 @@ export default function CustomerPage() {
       setLoading(false)
     }
   }
-
-  // const handleScanQR = async () => {
-  //   const hasPermission = await checkCameraPermission();
-  //   if (!hasPermission) return;
-
-  //   if (isScanning) return;
-  
-  //   setIsScanning(true);
-  
-  //   const config = {
-  //     fps: 10,
-  //     qrbox: 250,
-  //     aspectRatio: 1.0,
-  //   };
-  
-  //   const scanner = new Html5QrcodeScanner(qrRegionId, config, false);
-  //   scannerRef.current = scanner;
-  
-  //   scanner.render(
-  //     (decodedText) => {
-  //       console.log("QR Code Scanned: ", decodedText);
-  //       scanner.clear();
-  //       setIsScanning(false);
-  //       setQrData(decodedText);
-  //       handleQrDataSubmitData();
-  //       // Optionally, you can stop the scanner here
-
-  //     },
-  //     (errorMessage) => {
-  //       console.warn("QR Code Scan Error:", errorMessage);
-  //     }
-  //   );
-  // };
-
-  const checkCameraPermission = async () => {
-    try {
-      // Check for camera permission using the Permissions API
-      const result = await navigator.permissions.query({ name: "camera" as PermissionName });
-  
-      if (result.state === "granted") {
-        return true; // Already granted
-      } else if (result.state === "prompt") {
-        // Trigger prompt by requesting media access
-        await navigator.mediaDevices.getUserMedia({ video: true });
-        return true;
-      } else {
-        alert("Camera access is denied. Please enable it in your browser settings.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Error checking camera permission:", error);
-      return false;
-    }
-  };
   
 
   return (

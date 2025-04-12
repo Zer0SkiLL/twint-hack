@@ -157,21 +157,6 @@ export default function TransactionPage() {
           socket.close()
         }
 
-
-        // Update merchant orders in localStorage to reflect payment
-        const merchantOrders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
-        const updatedOrders = merchantOrders.map((order: any) => {
-          if (order.id === transaction.orderId) {
-            return {
-              ...order,
-              status: "completed",
-              txHash: result.txHash,
-            }
-          }
-          return order
-        })
-        localStorage.setItem("merchantOrders", JSON.stringify(updatedOrders))
-
         toast({
           title: "Payment successful",
           description: "Your transaction has been successfully processed.",

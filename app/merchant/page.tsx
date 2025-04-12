@@ -291,13 +291,20 @@ export default function MerchantPage() {
       socket.send(JSON.stringify({ type: "subscribe", orderId: activeOrder.id }))
     }
   
-    socket.onmessage = (event) => {
+    socket.onmessage = async (event) => {
       const data = JSON.parse(event.data)
       if (data.orderId === activeOrder.id) {
         setActiveOrder((prev) => ({
           ...prev!,
           status: data.status,
           txHash: data.txHash,
+        }))
+
+        const newBalance = await xrplService.getWalletBalance(walletInfo!.address)
+
+        setWalletInfo((prev) => ({
+          ...prev!,
+          balance: newBalance,
         }))
   
         toast({
@@ -311,40 +318,6 @@ export default function MerchantPage() {
       socket.close()
     }
   }, [activeOrder?.id])
-
-  // const checkOrderStatus = () => {
-  //   // In a real app, this would check the XRPL for transaction status
-  //   // For demo, we'll check localStorage
-  //   console.log("Checking order status...")
-  //   if (!activeOrder) return
-  //   console.log("Active order:", activeOrder)
-  //   if (activeOrder) {
-  //     const orders = JSON.parse(localStorage.getItem("merchantOrders") || "[]")
-  //     const order = orders.find((o: any) => o.id === activeOrder.id)
-  //     console.log("Order found:", order)
-
-  //     if (order && order.status !== activeOrder.status) {
-  //       setActiveOrder({
-  //         ...activeOrder,
-  //         status: order.status,
-  //         txHash: order.txHash,
-  //       })
-
-  //       if (order.status === "completed") {
-  //         toast({
-  //           title: "Payment received!",
-  //           description: `Order ${order.id} has been paid.`,
-  //         })
-  //       }
-  //     }
-  //   }
-  // }
-
-  // // Check order status every seconds
-  // useEffect(() => {
-  //   const interval = setInterval(checkOrderStatus, 1000)
-  //   return () => clearInterval(interval)
-  // }, [activeOrder])
 
   return (
     <div className="container mx-auto py-8 px-4">
