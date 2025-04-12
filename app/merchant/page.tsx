@@ -291,13 +291,20 @@ export default function MerchantPage() {
       socket.send(JSON.stringify({ type: "subscribe", orderId: activeOrder.id }))
     }
   
-    socket.onmessage = (event) => {
+    socket.onmessage = async (event) => {
       const data = JSON.parse(event.data)
       if (data.orderId === activeOrder.id) {
         setActiveOrder((prev) => ({
           ...prev!,
           status: data.status,
           txHash: data.txHash,
+        }))
+
+        const newBalance = await xrplService.getWalletBalance(walletInfo!.address)
+
+        setWalletInfo((prev) => ({
+          ...prev!,
+          balance: newBalance,
         }))
   
         toast({
