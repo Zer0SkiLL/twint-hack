@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { TransactionStatus } from "@/components/transaction-status"
 import { TransactionHistory } from "@/components/transaction-history" 
-import { FestivalHeader } from "@/components/festiva-header"
+import { FestivalHeader } from "@/components/festival-header"
 
 export default function MerchantPage() {
   const { toast } = useToast()

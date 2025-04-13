@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Music } from "lucide-react"
+import { ArrowLeft, Music, Map, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface FestivalHeaderProps {
@@ -27,6 +27,16 @@ export function FestivalHeader({ showBackButton = false, backUrl = "/", title }:
             </Link>
           </div>
           <h1 className="text-xl font-bold text-white">{title}</h1>
+          <div className="flex items-center space-x-4 ml-4">
+            <Link href="/map" className="text-white hover:text-white/80 flex items-center">
+              <Map className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">Map</span>
+            </Link>
+            <Link href="/organizer" className="text-white hover:text-white/80 flex items-center">
+              <BarChart3 className="h-4 w-4 mr-1" />
+              <span className="hidden sm:inline">Organizer</span>
+            </Link>
+          </div>
         </div>
       </div>
     </header>

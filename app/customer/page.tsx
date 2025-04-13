@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { TransactionHistory } from "@/components/transaction-history"
-import { FestivalHeader } from "@/components/festiva-header" 
+import { FestivalHeader } from "@/components/festival-header" 
 
 export default function CustomerPage() {
   const { toast } = useToast()
